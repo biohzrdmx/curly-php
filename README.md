@@ -27,7 +27,7 @@ You'll need to include `cacher.inc.php` [from here](https://github.com/biohzrdmx
 
 For `HTTPS` just grab a copy of `cacert.pem` [from here](https://curl.haxx.se/docs/caextract.html) and drop it on the same folder where the `curly.inc.php` file is located.
 
-###Licensing
+### Licensing
 
 This software is released under the MIT license.
 
@@ -39,6 +39,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-###Credits
+### Credits
 
 **Lead coder:** biohzrdmx [github.com/biohzrdmx](http://github.com/biohzrdmx)
