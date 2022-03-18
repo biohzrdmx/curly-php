@@ -6,7 +6,7 @@ declare(strict_types = 1);
  * Curly
  * Easy to use, general purpose CuRL wrapper
  * @author 	biohzrdmx <github.com/biohzrdmx>
- * @version 2.1
+ * @version 2.2
  * @license MIT
  */
 

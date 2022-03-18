@@ -33,7 +33,7 @@ if ($response && $response->getStatus() == 200) {
 }
 ```
 
-It's importante to note that `getBody` will parse `JSON` and `XML` payloads if the response has a valid `Content-Type` header, but you may disable that by passing `true` as the first parameter to get a `raw` response body;
+It's important to note that `getBody` will parse `JSON` and `XML` payloads if the response has a valid `Content-Type` header, but you may disable that by passing `true` as the first parameter to get a `raw` response body;
 
 Also if the request fails you may call `getError` or `getInfo` to find the cause of the failure.
 
@@ -48,10 +48,35 @@ $curly = Curly::newInstance($cainfo);
 
 Just grab a copy of `cacert.pem` [from here](https://curl.haxx.se/docs/caextract.html) and pass its absolute path. Curly will automatically honor your `php.ini` if its properly set there.
 
+#### Downloading files
+
+Starting from version 2.2 it's possible to stream file downloads directly to a file handle, to do so you will need to pass a resource before executing the request:
+
+```php
+$resource = fopen('/absolute/path/to/file.zip', 'wb');
+if ($resource) {
+  $curly = Curly::newInstance()
+    ->setMethod('GET')
+    ->setResource($resource)
+    ->setURL('https://my-web-app.com/assets/file.zip')
+    ->execute();
+  $response = $curly->getResponse();
+  fclose($resource);
+}
+```
+
+In this case the file data is written directly to the resource, so `$response->getBody()` will return an empty string, but you can check the status with `$response->getStatus()` and get the corresponding headers with `$response->getHeader()` and `$response->getHeaders()`.
+
+Remember to always close the file with `fclose`;
+
+#### Uploading files
+
 Also, there's support for file uploads with the `CURLFile` class,
 
 ```php
-$avatar = new \CURLFile('/absolute/path/to/avatar.png');
+use CURLFile;
+
+$avatar = new CURLFile('/absolute/path/to/avatar.png');
 $curly = Curly::newInstance()
   ->setMethod('POST')
   ->setURL('https://my-web-app.com/api/users/profile')
@@ -65,7 +90,7 @@ Just add your files like any other field and set the request method to `POST`, t
 
 This software is released under the MIT license.
 
-Copyright © 2021 biohzrdmx
+Copyright © 2022 biohzrdmx
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

@@ -116,6 +116,32 @@
 			$this->assertStringContainsString('Content-Type: application/json', $body);
 			$this->assertStringEndsWith('{"foo":"bar"}', $body);
 		}
+
+		public function testDownload() {
+			$body = null;
+			$source = dirname(__FILE__) . '/data.txt';
+			$target = dirname(__FILE__) . '/download.txt';
+			$resource = fopen($target, 'wb');
+			if ($resource) {
+				$curly = Curly::newInstance()
+					->setMethod('GET')
+					->setResource($resource)
+					->setURL('http://localhost:8080/download')
+					->execute();
+				$response = $curly->getResponse();
+				#
+				fclose($resource);
+				#
+				$hash_source = md5( file_get_contents($source) );
+				$hash_target = md5( file_get_contents($target) );
+				#
+				$this->assertInstanceOf(Response::class, $response);
+				$this->assertSame(200, $response->getStatus());
+				$this->assertSame($hash_source, $hash_target);
+			} else {
+				$this->fail();
+			}
+		}
 	}
 
 ?>

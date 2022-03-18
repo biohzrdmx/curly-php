@@ -6,7 +6,7 @@ declare(strict_types = 1);
  * Curly
  * Easy to use, general purpose CuRL wrapper
  * @author 	biohzrdmx <github.com/biohzrdmx>
- * @version 2.1
+ * @version 2.2
  * @license MIT
  */
 
@@ -71,6 +71,12 @@ class Curly {
 	 * @var Response|null
 	 */
 	protected $response = null;
+
+	/**
+	 * File resource
+	 * @var resource|null
+	 */
+	protected $resource = null;
 
 	/**
 	 * Request info
@@ -188,6 +194,16 @@ class Curly {
 	}
 
 	/**
+	 * Set a file resource to stream a download
+	 * @param resource $resource File resource
+	 * @return $this
+	 */
+	public function setResource($resource) {
+		$this->resource = $resource;
+		return $this;
+	}
+
+	/**
 	 * Set verbose flag
 	 * @param bool $verbose Verbose flag
 	 * @return $this
@@ -297,6 +313,10 @@ class Curly {
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $this->body);
 			}
 		}
+		# File download
+		if ($this->resource) {
+			curl_setopt($ch, CURLOPT_FILE, $this->resource);
+		}
 		# Prepare response objects
 		$body = '';
 		$headers = [];
@@ -321,7 +341,7 @@ class Curly {
 		$body = curl_exec($ch);
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		# @phpstan-ignore-next-line
-		$this->response = new Response($body ?: '', $headers, $status);
+		$this->response = new Response($this->resource ? '' : ($body ?: ''), $headers, $status);
 		# Get info about the request
 		$this->error = curl_error($ch);
 		$this->info = curl_getinfo($ch);

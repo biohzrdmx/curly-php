@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 'use strict'
 
-var server = require('net').createServer()
+let server = require('net').createServer()
+let fs = require('fs')
+let path = require('path')
 
-var cid = 0
+let cid = 0
 
 module.exports = server // for testing
 
@@ -12,8 +14,8 @@ onEmit(server, { ignore: ['connection', 'listening', 'error'] }, function (event
 })
 
 server.on('connection', function (c) {
-  var gotData = false
-  var _cid = ++cid
+  let gotData = false
+  let _cid = ++cid
 
   console.log('[server] event: connection (socket#%d)', _cid)
 
@@ -33,20 +35,31 @@ server.on('connection', function (c) {
     if ( chunk.toString().indexOf('DELETE / HTTP') >= 0 ) {
       server.close();
     }
-    console.log('--> ' + chunk.toString().split('\n').join('\n--> '))
-    if (!gotData) {
-      gotData = true
+    if ( chunk.toString().indexOf('GET /download') >= 0 ) {
       c.write('HTTP/1.1 200 OK\r\n')
-      c.write('Date: ' + (new Date()).toString() + '\r\n')
-      c.write('Connection: close\r\n')
-      c.write('Content-Type: text/plain\r\n')
-      c.write('Access-Control-Allow-Origin: *\r\n')
-      c.write('\r\n')
-      setTimeout(function () {
-        c.end()
-      }, 2000)
+        c.write('Date: ' + (new Date()).toString() + '\r\n')
+        c.write('Connection: close\r\n')
+        c.write('Content-Type: text/plain\r\n')
+        c.write('Access-Control-Allow-Origin: *\r\n')
+        c.write('\r\n')
+        fs.readFile(path.join(__dirname, 'data.txt'), function(error, content) {
+          c.end(content, 'utf-8')
+        })
+    } else {
+      console.log('--> ' + chunk.toString().split('\n').join('\n--> '))
+      if (!gotData) {
+        gotData = true
+        let content = '';
+        content += 'HTTP/1.1 200 OK\r\n'
+        content += 'Date: ' + (new Date()).toString() + '\r\n'
+        content += 'Connection: close\r\n'
+        content += 'Content-Type: text/plain\r\n'
+        content += 'Access-Control-Allow-Origin: *\r\n'
+        content += '\r\n'
+        content += chunk.toString()
+        c.end(content)
+      }
     }
-    c.write(chunk.toString())
   })
 
   c.on('error', function (err) {
@@ -55,7 +68,7 @@ server.on('connection', function (c) {
 })
 
 server.on('listening', function () {
-  var port = server.address().port
+  let port = server.address().port
   console.log('[server] event: listening (port: %d)', port)
 })
 
@@ -63,14 +76,14 @@ server.on('error', function (err) {
   console.log('[server] event: error (msg: %s)', err.message)
 })
 
-var port = process.argv[2] || process.env.PORT
+let port = process.argv[2] || process.env.PORT
 
 if (port) {
   server.listen(port)
 }
 
 function onEmit (emitter, opts, cb) {
-  var emitFn = emitter.emit
+  let emitFn = emitter.emit
   emitter.emit = function (eventName) {
     if (opts.ignore.indexOf(eventName) === -1) cb.apply(null, arguments)
     return emitFn.apply(emitter, arguments)
